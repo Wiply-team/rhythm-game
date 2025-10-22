@@ -23,7 +23,7 @@ export class Hold {
   }
 }
 
-export class Judgement {
+export class JudgementClass {
   public name: string;
   public score: number;
   public multiplier: number;
@@ -74,7 +74,7 @@ export class Game {
   public DOM: { [key: string]: HTMLElement };
   public keybind: { [key: string]: string };
   public notes: { [key: string]: (expectedTime: number, additionalData?: any) => Tap | Hold };
-  public judgements: Judgement[];
+  public judgements: JudgementClass[];
   public sizePerBeat: string;
   public laneSizeRatio: number;
   public judgementPosition: number;
@@ -88,7 +88,7 @@ export class Game {
     DOM: { [key: string]: HTMLElement };
     keybind: { [key: string]: string };
     notes: { [key: string]: (expectedTime: number, additionalData?: any) => Tap | Hold };
-    judgements: Judgement[];
+    judgements: JudgementClass[];
     sizePerBeat: string;
     laneSizeRatio: number;
     judgementPosition: number;

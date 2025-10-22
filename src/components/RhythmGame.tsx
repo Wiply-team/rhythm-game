@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { RhythmGameProps, SongConfig, GenerationOptions, SpeedSettings, Judgement } from '../types';
-import { Game, Song, Tap, Hold, Judgement as JudgementClass } from '../game/classes';
+import { Game, Song, Tap, Hold, JudgementClass } from '../game/classes';
 import { generateRandomChart } from '../game/generator';
 import styles from './RhythmGame.module.css';
 
