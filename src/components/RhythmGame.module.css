@@ -947,10 +947,12 @@
     background: rgba(255, 255, 255, 0.9);
     border: 3px solid #ff4757;
     border-radius: 20px;
-    padding: 30px;
+    padding: 40px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    max-width: 600px;
+    width: 90%;
 }
 
 .startMessage p, .endMessage div {
@@ -1147,10 +1149,10 @@
 /* Мобильные стили для стартового и конечного сообщений */
 @media (max-width: 768px) {
     .startMessage, .endMessage {
-        padding: 15px;
-        max-width: 85%;
+        padding: 25px;
+        max-width: 98%;
         border-radius: 12px;
-        margin: 10px;
+        margin: 5px;
         font-size: 16px;
     }
     
@@ -1182,14 +1184,30 @@
         width: 16px;
         height: 16px;
     }
+    
+    .songContainer {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .songLabel {
+        padding: 6px 10px;
+        font-size: 12px;
+        border-radius: 6px;
+    }
+    
+    .songCheckbox {
+        width: 16px;
+        height: 16px;
+    }
 }
 
 @media (max-width: 480px) {
     .startMessage, .endMessage {
-        padding: 12px;
-        max-width: 90%;
+        padding: 20px;
+        max-width: 98%;
         border-radius: 10px;
-        margin: 8px;
+        margin: 5px;
         font-size: 14px;
     }
     
@@ -1215,6 +1233,22 @@
     }
     
     .difficultyCheckbox {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .songContainer {
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+    
+    .songLabel {
+        padding: 5px 8px;
+        font-size: 11px;
+        border-radius: 5px;
+    }
+    
+    .songCheckbox {
         width: 14px;
         height: 14px;
     }
