@@ -1,0 +1,1221 @@
+.gameContainer {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Arial', sans-serif;
+    /* Отключаем выделение текста для всего контейнера */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 🎮 ИГРОВОЕ ПОЛЕ */
+.gameField {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+/* 🎮 КОНТЕЙНЕР СТОЛБИКОВ */
+.lanesContainer {
+    display: flex;
+    gap: 20px;
+    width: 480px;
+    /* 4 столбика по 100px + 3 промежутка по 20px = 480px */
+}
+
+.judgementData {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+    color: white;
+    font-size: 24px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.lane {
+    width: 100px;
+    height: 550px;
+    /* Уменьшаем высоту чтобы ноты не наезжали на кнопки */
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    display: inline-block;
+    margin: 0;
+    position: relative;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box;
+    overflow: hidden;
+    /* Скрываем части нот, которые выходят за границы */
+    /* Отключаем выделение текста */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Прогресс-заполнение комбо в колонках */
+.laneComboProgress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.2);
+    transition: height 0.3s ease-out, opacity 0.3s ease-out;
+    z-index: 1;
+    border-radius: 0 0 8px 8px;
+}
+
+/* Зона нажатия (Hit Zone) */
+.hitZone {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 15%;
+    background: linear-gradient(to top,
+            rgba(255, 215, 0, 0.6),
+            rgba(255, 215, 0, 0.2));
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    z-index: 1;
+    pointer-events: none;
+    box-shadow: 0 -2px 10px rgba(255, 215, 0, 0.4);
+    transition: all 0.1s ease;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 -2px 10px rgba(255, 215, 0, 0.4);
+        background: linear-gradient(to top,
+                rgba(255, 215, 0, 0.6),
+                rgba(255, 215, 0, 0.2));
+    }
+
+    50% {
+        box-shadow: 0 -4px 20px rgba(255, 215, 0, 0.7);
+        background: linear-gradient(to top,
+                rgba(255, 215, 0, 0.8),
+                rgba(255, 215, 0, 0.3));
+    }
+}
+
+/* Эффект при нажатии клавиши */
+.lane.active .hitZone {
+    background: linear-gradient(to top,
+            rgba(0, 255, 127, 0.9),
+            rgba(0, 255, 127, 0.4));
+    box-shadow: 0 -4px 20px rgba(0, 255, 127, 0.8);
+    transform: scale(1.05);
+}
+
+.note {
+    width: 99.5px !important;
+    height: var(--size);
+    background: linear-gradient(180deg, #ff6b6b 0%, #ff4757 100%);
+    position: absolute;
+    left: 0.25px !important;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    box-sizing: border-box;
+    will-change: transform;
+}
+
+/* 🎨 ЦВЕТНЫЕ НОТЫ ДЛЯ КАЖДОГО СТОЛБИКА */
+.lane:nth-child(1) .note {
+    background: linear-gradient(180deg, #ff6b6b 0%, #ff4757 100%);
+}
+
+.lane:nth-child(2) .note {
+    background: linear-gradient(180deg, #5352ed 0%, #3742fa 100%);
+}
+
+.lane:nth-child(3) .note {
+    background: linear-gradient(180deg, #2ed573 0%, #20bf6b 100%);
+}
+
+.lane:nth-child(4) .note {
+    background: linear-gradient(180deg, #a0522d 0%, #8b4513 100%);
+}
+
+/* Длинные ноты (Hold) */
+.longNote {
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    animation: holdPulse 1.5s ease-in-out infinite, longAppear 0.25s ease-out;
+    /* без transform */
+    transform-origin: top;
+    /* лучше НЕ анимировать всё подряд, чтобы Safari не «смягчал» translateY */
+    transition: opacity 0.1s ease;
+}
+
+/* простая поява по прозрачности вместо scaleY */
+@keyframes longAppear {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes holdPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+    }
+}
+
+.lane:nth-child(1) .long {
+    background: linear-gradient(180deg, #ff6b6b 0%, #ff4757 100%);
+    border: 2px solid #ff3742;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.6),
+        0 0 8px rgba(255, 71, 87, 0.4);
+    width: 96px !important;
+    left: 2px !important;
+}
+
+.lane:nth-child(2) .long {
+    background: linear-gradient(180deg, #5352ed 0%, #3742fa 100%);
+    border: 2px solid #2f3542;
+    box-shadow: 0 4px 12px rgba(83, 82, 237, 0.6),
+        0 0 8px rgba(55, 66, 250, 0.4);
+    width: 96px !important;
+    left: 2px !important;
+}
+
+.lane:nth-child(3) .long {
+    background: linear-gradient(180deg, #2ed573 0%, #20bf6b 100%);
+    border: 2px solid #1e8e3e;
+    box-shadow: 0 4px 12px rgba(46, 213, 115, 0.6),
+        0 0 8px rgba(32, 191, 107, 0.4);
+    width: 96px !important;
+    left: 2px !important;
+}
+
+.lane:nth-child(4) .long {
+    background: linear-gradient(180deg, #a0522d 0%, #8b4513 100%);
+    border: 2px solid #654321;
+    box-shadow: 0 4px 12px rgba(160, 82, 45, 0.6),
+        0 0 8px rgba(139, 69, 19, 0.4);
+    width: 96px !important;
+    left: 2px !important;
+}
+
+/* Специальный стиль для Hold нот */
+.hold {
+    animation: holdPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes holdPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 4px 12px rgba(78, 205, 196, 0.6),
+            0 0 8px rgba(46, 213, 115, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 6px 16px rgba(78, 205, 196, 0.8),
+            0 0 12px rgba(46, 213, 115, 0.6);
+    }
+}
+
+@keyframes move {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(var(--lane-size));
+    }
+}
+
+@keyframes fade {
+    0% {
+        bottom: 0;
+        height: var(--size);
+        opacity: 1;
+    }
+
+    100% {
+        bottom: 0;
+        height: 0;
+        opacity: 0;
+    }
+}
+
+/* 🎮 КОНТЕЙНЕР ДЛЯ КНОПОК */
+.buttonsContainer {
+    display: flex;
+    gap: 20px;
+    width: 480px;
+}
+
+/* 🎮 ИГРОВЫЕ КНОПКИ */
+.gameButton {
+    width: 100px;
+    height: 80px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    box-shadow: none;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background: transparent;
+    /* Отключаем выделение текста */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.gameButton:hover {
+    transform: scale(1.05);
+    box-shadow: none;
+}
+
+.gameButton:active {
+    transform: scale(0.95);
+    box-shadow: none;
+}
+
+/* Цветовые схемы кнопок */
+.redButton {
+    background: #ff4757;
+}
+
+.blueButton {
+    background: #3742fa;
+}
+
+.greenButton {
+    background: #2ed573;
+}
+
+.brownButton {
+    background: #8b4513;
+}
+
+/* Стили для кнопок с изображениями */
+.imageButton {
+    background: transparent;
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    /* Предотвращаем контекстное меню */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.buttonImage {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 12px;
+    /* Отключаем контекстное меню при долгом нажатии */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: none;
+    /* Дополнительные свойства для предотвращения контекстного меню */
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    touch-action: manipulation;
+}
+
+.buttonLetter {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Скрываем буквы на мобильных устройствах */
+@media (max-width: 768px) {
+    .buttonLetter {
+        display: none;
+    }
+}
+
+/* Стили для счёта и таймера */
+.scoreContainer {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 12px 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+.scoreContainer span {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Уменьшенный шрифт для больших счётов */
+.scoreLarge {
+    font-size: 18px !important;
+}
+
+/* Анимация пульсации для счётчика */
+.scorePulse {
+    animation: scorePulse 0.3s ease-out;
+}
+
+@keyframes scorePulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.timerContainer {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 12px 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+.timerNormal {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.timerWarning {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff4757;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.bpmContainer {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 12px 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.bpmText {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2ed573;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.analyzingText {
+    font-size: 12px;
+    color: #ffa502;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Эффект при нажатии кнопки */
+.gameButton.pressed {
+    transform: scale(0.9);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 📱 АДАПТИВНЫЙ ДИЗАЙН ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ */
+@media (max-width: 768px) {
+    .gameField {
+        gap: 15px;
+        padding: 15px;
+        width: 100%;
+        max-width: 100%;
+        margin-top: -50px;
+        /* Поднимаем игровое поле выше */
+    }
+
+    .lanesContainer {
+        gap: 12px;
+        width: 100%;
+        max-width: 90%;
+        justify-content: center;
+        display: flex;
+    }
+
+    .lane {
+        width: 80px;
+        height: 400px;
+        /* Значительно уменьшаем высоту для мобильных */
+        flex: 1;
+        max-width: 100px;
+        min-width: 60px;
+        overflow: hidden;
+        /* Скрываем части нот, которые выходят за границы */
+    }
+
+    .note {
+        width: 79.5px !important;
+        left: 0.25px !important;
+    }
+
+    .lane:nth-child(1) .long,
+    .lane:nth-child(2) .long,
+    .lane:nth-child(3) .long,
+    .lane:nth-child(4) .long {
+        width: 76px !important;
+        left: 2px !important;
+    }
+
+    .buttonsContainer {
+        gap: 12px;
+        width: 100%;
+        max-width: 90%;
+        justify-content: center;
+    }
+
+    .gameButton {
+        width: 80px;
+        height: 70px;
+        font-size: 16px;
+        flex: 1;
+        max-width: 100px;
+    }
+
+    .hitZone {
+        height: 15%;
+    }
+
+    .judgementData {
+        font-size: 20px;
+        top: 15px;
+        left: 15px;
+        z-index: 20;
+        /* Увеличиваем z-index чтобы счетчик был поверх игрового поля */
+    }
+    
+    .heart {
+        font-size: 14px !important;
+    }
+    
+    .comboDisplay {
+        font-size: 120px;
+    }
+    
+    .scoreLarge {
+        font-size: 16px !important;
+    }
+}
+
+/* 📱 ДЛЯ ОЧЕНЬ МАЛЕНЬКИХ ЭКРАНОВ */
+@media (max-width: 480px) {
+    .gameField {
+        margin-top: -80px;
+        /* Еще больше поднимаем для маленьких экранов */
+    }
+
+    .lanesContainer {
+        gap: 8px;
+        max-width: 95%;
+        display: flex;
+    }
+
+    .lane {
+        width: 70px;
+        height: 350px;
+        /* Еще больше уменьшаем для маленьких экранов */
+        flex: 1;
+        max-width: 90px;
+        min-width: 50px;
+        overflow: hidden;
+        /* Скрываем части нот, которые выходят за границы */
+    }
+
+    .note {
+        width: 69.5px !important;
+        left: 0.25px !important;
+    }
+
+    .lane:nth-child(1) .long,
+    .lane:nth-child(2) .long,
+    .lane:nth-child(3) .long,
+    .lane:nth-child(4) .long {
+        width: 66px !important;
+        left: 2px !important;
+    }
+
+    .buttonsContainer {
+        gap: 8px;
+        max-width: 95%;
+    }
+
+    .gameButton {
+        width: 70px;
+        height: 60px;
+        font-size: 14px;
+        flex: 1;
+        max-width: 90px;
+    }
+
+    .judgementData {
+        font-size: 18px;
+        z-index: 20;
+        /* Увеличиваем z-index чтобы счетчик был поверх игрового поля */
+    }
+    
+    .heart {
+        font-size: 12px !important;
+    }
+    
+    .comboDisplay {
+        font-size: 100px;
+    }
+    
+    .scoreLarge {
+        font-size: 14px !important;
+    }
+}
+
+/* Анимация для всплывающих уведомлений с эффектом наезда */
+@keyframes judgementPop {
+    0% {
+        opacity: 0.6;
+        transform: translate(-50%, -50%) scale(0.5);
+        font-size: 20px;
+    }
+
+    20% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(0.8);
+        font-size: 28px;
+    }
+
+    50% {
+        opacity: 0.9;
+        transform: translate(-50%, -50%) scale(1.2);
+        font-size: 36px;
+    }
+
+    80% {
+        opacity: 0.7;
+        transform: translate(-50%, -50%) scale(1.8);
+        font-size: 48px;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(2.5);
+        font-size: 60px;
+    }
+}
+
+/* === Judgement overlay + particles === */
+.judgementOverlay {
+    position: fixed;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.6);
+    pointer-events: none;
+    font-family: Arial, sans-serif;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0;
+    filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 40px rgba(0, 0, 0, 0.6));
+    animation: judgementAppear 0.8s ease-out forwards;
+    z-index: 2000;
+}
+
+.judgementLite {
+    filter: none;
+    text-shadow: 0 0 8px rgba(0, 0, 0, .4);
+}
+
+.judgementHit {
+    color: #ffd700;
+    text-shadow: 0 0 12px rgba(46, 213, 115, 0.7), 0 0 24px rgba(46, 213, 115, 0.35);
+}
+
+.judgementEarly {
+    color: #ff3030;
+    text-shadow: 0 0 12px rgba(255, 165, 2, 0.7), 0 0 24px rgba(255, 165, 2, 0.35);
+}
+
+.judgementMiss {
+    color: #9ca3af;
+    text-shadow: 0 0 10px rgba(0, 0, 0, .6), 0 0 18px rgba(0, 0, 0, .35);
+}
+
+/* Адаптивные размеры для мобильных устройств */
+@media (max-width: 768px) {
+    .judgementOverlay {
+        font-size: 28px !important;
+    }
+
+    .judgementEarly {
+        font-size: 24px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .judgementOverlay {
+        font-size: 24px !important;
+    }
+
+    .judgementEarly {
+        font-size: 20px !important;
+    }
+}
+
+@keyframes judgementAppear {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.6);
+    }
+
+    30% {
+        opacity: 0.95;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.6);
+    }
+}
+
+/* Контейнер частиц (привязан к оверлею) */
+.judgementParticles {
+    position: absolute;
+    left: 50%;
+    top: 65%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    /* якорь в центре надписи */
+}
+
+/* Одна частица */
+.judgementParticle {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: currentColor;
+    /* наследует цвет надписи-hit/early */
+    opacity: 0.9;
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    animation-name: particleDrift;
+    animation-timing-function: cubic-bezier(.2, .65, .2, 1);
+    animation-fill-mode: forwards;
+}
+
+/* Разные формы по классу */
+.judgementParticle.circle {
+    border-radius: 50%;
+}
+
+.judgementParticle.diamond {
+    transform: translate(0, 0) rotate(45deg);
+}
+
+@keyframes particleDrift {
+    0% {
+        opacity: 0.95;
+        transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform:
+            translate(var(--tx, 0px), var(--ty, 90px)) rotate(var(--rot, 0deg)) scale(0.6);
+    }
+}
+
+/* общий BPM-пульс; подмешиваем прозрачный glow */
+@keyframes bpmPulse {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+        transform: scale(1);
+    }
+
+    50% {
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, .25));
+        transform: scale(1.02);
+    }
+}
+
+.pulseBg {
+    animation: bpmPulse var(--bpm-period, 0.5s) ease-in-out infinite;
+}
+
+/* лёгкий пульс hit zone */
+.hitZonePulse {
+    animation: bpmPulse var(--bpm-period, 0.5s) ease-in-out infinite;
+}
+
+/* кнопки тоже чуть пульсируют */
+.gameButtonPulse {
+    animation: bpmPulse var(--bpm-period, 0.5s) ease-in-out infinite;
+}
+
+@keyframes laneFlash {
+    0% {
+        box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+    }
+
+    30% {
+        box-shadow: 0 0 20px rgba(255, 255, 255, .5);
+    }
+
+    100% {
+        box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+    }
+}
+
+.laneFlash {
+    animation: laneFlash 220ms ease-out;
+}
+
+@keyframes tinyShake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    30% {
+        transform: translateX(-2px);
+    }
+
+    60% {
+        transform: translateX(2px);
+    }
+}
+
+.tinyShake {
+    animation: tinyShake 100ms ease-out;
+    will-change: transform;
+}
+
+
+.noteTail::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -18px;
+    height: 24px;
+    background: linear-gradient(to bottom, currentColor 0%, transparent 100%);
+    opacity: .35;
+    filter: blur(6px);
+    pointer-events: none;
+}
+
+.ios .judgementOverlay {
+    filter: none;
+    text-shadow: none;
+}
+
+.ios .laneFlash {
+    box-shadow: none;
+}
+
+.ios .tinyShake {
+    animation-duration: 80ms;
+}
+
+.ios .gameButton {
+    filter: none;
+    box-shadow: none;
+}
+
+.gameContainer,
+.buttonsContainer,
+.gameButton {
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes screenFlash {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.screenFlash::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(255, 0, 0, 0.3);
+    z-index: 9999;
+    pointer-events: none;
+    animation: screenFlash 0.1s ease-out;
+}
+
+/* Стили для начального и конечного сообщений */
+.startMessage, .endMessage {
+    background: rgba(255, 255, 255, 0.9);
+    border: 3px solid #ff4757;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.startMessage p, .endMessage div {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.startMessage button, .endMessage button {
+    background: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 15px 30px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+}
+
+.startMessage button:hover, .endMessage button:hover {
+    background: #ff3742;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+}
+
+.startMessage button:active, .endMessage button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(255, 71, 87, 0.3);
+}
+
+/* Стили для выбора сложности */
+.difficultyContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.difficultyLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.difficultyLabel:hover {
+    background: rgba(255, 71, 87, 0.1);
+}
+
+.difficultyCheckbox {
+    width: 20px;
+    height: 20px;
+    accent-color: #ff4757;
+    cursor: pointer;
+}
+
+.difficultyLabel.selected {
+    background: rgba(255, 71, 87, 0.2);
+    border: 2px solid #ff4757;
+}
+
+/* Стили для выбора песни */
+.songContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.songContainer h3 {
+    color: black;
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.songLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid transparent;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.songLabel:hover {
+    background: rgba(46, 213, 115, 0.1);
+}
+
+.songCheckbox {
+    width: 20px;
+    height: 20px;
+    accent-color: #2ed573;
+    cursor: pointer;
+}
+
+.songLabel.selected {
+    background: rgba(46, 213, 115, 0.2);
+    border: 2px solid #2ed573;
+}
+
+/* Стили для отображения жизней */
+.livesContainer {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+}
+
+/* Стили для комбо-счетчика в центре */
+.comboDisplay {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 200px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.2);
+    z-index: 5;
+    pointer-events: none;
+    user-select: none;
+    animation: comboPulse 0.3s ease-out;
+}
+
+@keyframes comboPulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0.5;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.2;
+    }
+}
+
+
+.heart {
+    font-size: 24px;
+    color: #ff4757;
+    text-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
+    transition: all 0.3s ease;
+}
+
+.heart.lost {
+    color: #666;
+    text-shadow: none;
+    transform: scale(0.8);
+    opacity: 0.5;
+}
+
+.heart.lost::before {
+    content: '💔';
+    position: absolute;
+    left: 0;
+    top: 0;
+    animation: heartBreak 0.5s ease-out;
+}
+
+@keyframes heartBreak {
+    0% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2) rotate(10deg);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(0.8) rotate(-10deg);
+        opacity: 0.5;
+    }
+}
+
+/* Мобильные стили для стартового и конечного сообщений */
+@media (max-width: 768px) {
+    .startMessage, .endMessage {
+        padding: 15px;
+        max-width: 85%;
+        border-radius: 12px;
+        margin: 10px;
+        font-size: 16px;
+    }
+    
+    .startMessage p, .endMessage div {
+        font-size: 12px;
+        margin-bottom: 8px;
+        line-height: 1.3;
+    }
+    
+    .startMessage button, .endMessage button {
+        padding: 6px 12px;
+        font-size: 12px;
+        margin: 3px;
+        border-radius: 8px;
+    }
+    
+    .difficultyContainer {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .difficultyLabel {
+        padding: 6px 10px;
+        font-size: 12px;
+        border-radius: 6px;
+    }
+    
+    .difficultyCheckbox {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .startMessage, .endMessage {
+        padding: 12px;
+        max-width: 90%;
+        border-radius: 10px;
+        margin: 8px;
+        font-size: 14px;
+    }
+    
+    .startMessage p, .endMessage div {
+        font-size: 11px;
+        margin-bottom: 6px;
+    }
+    
+    .startMessage button, .endMessage button {
+        padding: 5px 10px;
+        font-size: 11px;
+        margin: 2px;
+    }
+    
+    .difficultyContainer {
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+    
+    .difficultyLabel {
+        padding: 5px 8px;
+        font-size: 11px;
+    }
+    
+    .difficultyCheckbox {
+        width: 14px;
+        height: 14px;
+    }
+}

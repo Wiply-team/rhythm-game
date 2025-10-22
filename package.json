@@ -1,0 +1,40 @@
+{
+  "name": "nextjs-rhythm-game",
+  "version": "1.0.0",
+  "description": "A rhythm game built with Next.js and Web Audio API",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "canvas-confetti": "^1.9.3",
+    "next": "^14.0.0",
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "web-audio-beat-detector": "^8.2.31"
+  },
+  "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "^14.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "rhythm",
+    "game",
+    "nextjs",
+    "react",
+    "web-audio",
+    "music",
+    "beat-detection"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
