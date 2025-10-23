@@ -204,29 +204,6 @@ export default function SimpleRhythmGame() {
   };
 
   
-  // Функция для обновления комбо
-  const updateCombo = (isHit: boolean) => {
-    if (isHit) {
-      setCombo((prevCombo) => {
-        const newCombo = prevCombo + 1;
-        const newProgress = newCombo % 10; // Прогресс от 0 до 9
-        const newMultiplier = Math.floor(newCombo / 10) + 1; // Увеличиваем каждые 10 попаданий
-
-        setComboProgress(newProgress);
-        setComboMultiplier((prevMultiplier) => {
-          const finalMultiplier = Math.min(newMultiplier, 5); // Максимум x5
-          // Если комбо увеличилось, запускаем пульсацию
-          if (finalMultiplier > prevMultiplier) {
-            triggerScorePulse();
-          }
-          return finalMultiplier;
-        });
-
-        return newCombo;
-      });
-    }
-    // Убираем сброс комбо при промахах - только при потере жизней
-  };
 
   // Функция для сброса комбо (вызывается только при потере жизней)
   const resetCombo = () => {
@@ -645,10 +622,24 @@ export default function SimpleRhythmGame() {
       if (shortNotesInZone.length > 0) {
         // Короткая нота - обычное попадание
         const hitNote = shortNotesInZone[0];
-        const baseScore = 50;
-        const finalScore = baseScore * comboMultiplier;
-        setScore((prev) => prev + finalScore);
-        updateCombo(true);
+          const baseScore = 25;
+        
+        // Обновляем комбо и получаем новый множитель
+        setCombo((prevCombo) => {
+          const newCombo = prevCombo + 1;
+          const newMultiplier = Math.floor(newCombo / 10) + 1;
+          const finalMultiplier = Math.min(newMultiplier, 5);
+          
+          const finalScore = baseScore * finalMultiplier;
+          console.log(`Combo: ${prevCombo} -> ${newCombo}, Multiplier: ${finalMultiplier}, Score: ${baseScore} * ${finalMultiplier} = ${finalScore}`);
+          setScore((prev) => prev + finalScore);
+          
+          // Обновляем прогресс и множитель
+          setComboProgress(newCombo % 10);
+          setComboMultiplier(finalMultiplier);
+          
+          return newCombo;
+        });
         showJudgement("HIT!", "hit");
 
         requestAnimationFrame(() => {
@@ -920,10 +911,24 @@ export default function SimpleRhythmGame() {
 
         if (shortNotesInZone.length > 0) {
           const hitNote = shortNotesInZone[0];
-          const baseScore = 50;
-          const finalScore = baseScore * comboMultiplier;
-          setScore((prev) => prev + finalScore);
-          updateCombo(true);
+          const baseScore = 25;
+          
+          // Обновляем комбо и получаем новый множитель
+          setCombo((prevCombo) => {
+            const newCombo = prevCombo + 1;
+            const newMultiplier = Math.floor(newCombo / 10) + 1;
+            const finalMultiplier = Math.min(newMultiplier, 5);
+            
+            const finalScore = baseScore * finalMultiplier;
+            console.log(`Keyboard Combo: ${prevCombo} -> ${newCombo}, Multiplier: ${finalMultiplier}, Score: ${baseScore} * ${finalMultiplier} = ${finalScore}`);
+            setScore((prev) => prev + finalScore);
+            
+            // Обновляем прогресс и множитель
+            setComboProgress(newCombo % 10);
+            setComboMultiplier(finalMultiplier);
+            
+            return newCombo;
+          });
           showJudgement("HIT!", "hit");
 
           // фейерверк в точке исчезнувшей короткой ноты + вспышка дорожки
@@ -1069,10 +1074,24 @@ export default function SimpleRhythmGame() {
               const deltaPx = deltaUnits * 20; // 1 unit = 20px, см. высоту long: length * 20
 
               if (newLength <= 0) {
-                const baseScore = 100;
-                const finalScore = baseScore * comboMultiplier;
-                setScore((prev) => prev + finalScore);
-                updateCombo(true);
+                const baseScore = 50;
+                
+                // Обновляем комбо и получаем новый множитель
+                setCombo((prevCombo) => {
+                  const newCombo = prevCombo + 1;
+                  const newMultiplier = Math.floor(newCombo / 10) + 1;
+                  const finalMultiplier = Math.min(newMultiplier, 5);
+                  
+                  const finalScore = baseScore * finalMultiplier;
+                  console.log(`Long Note Combo: ${prevCombo} -> ${newCombo}, Multiplier: ${finalMultiplier}, Score: ${baseScore} * ${finalMultiplier} = ${finalScore}`);
+                  setScore((prev) => prev + finalScore);
+                  
+                  // Обновляем прогресс и множитель
+                  setComboProgress(newCombo % 10);
+                  setComboMultiplier(finalMultiplier);
+                  
+                  return newCombo;
+                });
                 showJudgement("HIT!", "hit");
                 return null; // удалить ноту
               }
