@@ -1156,7 +1156,7 @@ export default function SimpleRhythmGame() {
   const getSongPath = () => {
     switch (selectedSong) {
       case "RATATATA":
-        return "/music/ratatata.mp3";
+        return "/music/FOROMER.mp3";
       case "NOVOCAINE":
         return "/music/Novocaine.mp3";
       case "SLTS":
